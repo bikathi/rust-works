@@ -1,6 +1,6 @@
 use clap::Parser;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum CharactersMode {
     Numeric,
     Uppercase,
@@ -44,7 +44,7 @@ impl CliOptions {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct RandomizerOptions {
     pub total_number: usize,
     pub length_of_strings: usize,
@@ -52,6 +52,35 @@ pub struct RandomizerOptions {
 }
 
 #[cfg(test)]
-mod tests {
+mod test {
+    use crate::parser::{CharactersMode, RandomizerOptions};
+
+    use super::CliOptions;
+
+    #[test]
+    #[should_panic]
+    fn should_panic_on_conversion() {
+        match CliOptions::convert_into(&CliOptions { total_strings: 1, length_of_strings: 1, chars_mode: 10 }) {
+            Ok(_) => (),
+            Err(_) => panic!("converter panicked!"),
+        }
+    }
     
+    #[test]
+    fn should_correctly_convert() {
+        let mut converted_matches = false;
+        
+        if let Ok(randomizer_opts) = CliOptions::convert_into(&CliOptions { total_strings: 1, length_of_strings: 1, chars_mode: 4 }) {
+            if randomizer_opts == (RandomizerOptions {
+                total_number: 1, 
+                length_of_strings: 1,
+                mode: CharactersMode::Mixed,
+                
+            }) {
+                converted_matches = true
+            }
+        }
+        
+        assert_eq!(converted_matches, true);
+    }
 }
