@@ -1,5 +1,5 @@
 use clap::Parser;
-use std::str::FromStr;
+use std::{fmt::Display, str::FromStr};
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum CharactersMode {
@@ -23,6 +23,17 @@ impl FromStr for CharactersMode {
     }
 }
 
+impl Display for CharactersMode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            CharactersMode::Numeric => write!(f, "numeric"),
+            CharactersMode::Uppercase => write!(f, "uppercase"),
+            CharactersMode::Lowercase => write!(f, "lowercase"),
+            CharactersMode::Mixed => write!(f, "mixed")
+        }
+    }
+}
+
 #[derive(Parser, Debug, PartialEq)]
 #[command(version, about)]
 pub struct RandomizerOptions {
@@ -32,6 +43,6 @@ pub struct RandomizerOptions {
     #[arg(short = 'l', long = "length-of-strings")]
     pub length_of_strings: usize,
     
-    #[arg(short = 'm', long = "chars-mode")]
+    #[arg(short = 'm', long = "chars-mode", default_value_t = CharactersMode::Mixed)]
     pub mode: CharactersMode, // 1 for numeric only, 2 for uppercase, 3 for lowercase, 4 for mixed
 }
