@@ -12,6 +12,9 @@ pub struct RandomizerOptions {
     
     #[arg(short = 'm', long = "chars-mode", default_value_t = CharactersMode::Mixed)]
     pub mode: CharactersMode, // 1 for numeric only, 2 for uppercase, 3 for lowercase, 4 for mixed
+    
+    #[arg(short = 'o', long = "output-file", default_value = None)]
+    pub output_file: Option<String>
 }
 
 #[derive(Debug, PartialEq, Clone)]
