@@ -2,29 +2,30 @@ use crate::parser::*;
 use rand::Rng;
 use crate::utils::generate_mix;
 
-pub fn generate_string(options: &RandomizerOptions) -> String {
-    let scope = generate_mix(&options.mode);
+pub fn generate_crude_string(options: &RandomizerOptions) -> String {
+    let scope: Vec<char> = generate_mix(&options.mode);
     let mut result = String::new();
     
     for _ in 0..options.length_of_strings {
         let secret_number = rand::rng().random_range(0..scope.len());
-        result.push_str(scope.get(secret_number..=secret_number).unwrap());
+        result.push(scope[secret_number]);
     }
     result
 }
+
 
 #[cfg(test)]
 mod tests {
     use super::*;
     
-    fn mix(mode: &CharactersMode) -> String {
+    fn mix(mode: &CharactersMode) -> Vec<char> {
         generate_mix(mode)
     }
     
-    fn check_mix_mode(mode: CharactersMode, mix: &String) -> bool {
+    fn check_mix_mode(mode: CharactersMode, mix: &Vec<char>) -> bool {
         match mode {
             CharactersMode::Lowercase => {
-                for c in mix.chars() {
+                for c in mix {
                     if c.is_lowercase() {
                         return true
                     }
@@ -34,7 +35,7 @@ mod tests {
             },
             
             CharactersMode::Uppercase => {
-                for c in mix.chars() {
+                for c in mix {
                     if c.is_uppercase() {
                         return true
                     }
@@ -44,7 +45,7 @@ mod tests {
             },
             
             CharactersMode::Numeric => {
-                for c in mix.chars() {
+                for c in mix {
                     if c.is_numeric() {
                         return true
                     }
@@ -58,7 +59,7 @@ mod tests {
                 let mut has_uppercase = false;
                 let mut has_numeric = false;
                 
-                for c in mix.chars() {
+                for c in mix {
                     if c.is_lowercase() {
                         has_lowercase =  true;
                         continue;
@@ -86,7 +87,7 @@ mod tests {
     
     #[test]
     fn should_return_non_empty_mix() {
-        let mix: String = mix(&CharactersMode::Mixed);
+        let mix: Vec<char> = mix(&CharactersMode::Mixed);
         assert!(!mix.is_empty());
     }
     
@@ -94,13 +95,13 @@ mod tests {
     fn should_generate_reliable_mix() {
         // check mix only contains lowercase for a test case
         let mode: CharactersMode = CharactersMode::Lowercase;
-        let mix: String = mix(&mode);
+        let mix: Vec<char> = mix(&mode);
         assert_eq!(check_mix_mode(mode, &mix), true);
     }
     
     #[test]
     fn should_generate_random_uppercase_string() {
-        let random_str = generate_string(
+        let random_str = generate_crude_string(
             &RandomizerOptions { 
                 total_number: 1, 
                 length_of_strings: 10, 
@@ -114,7 +115,7 @@ mod tests {
     
     #[test]
     fn should_generate_random_lowercase_string() {
-        let random_str = generate_string(
+        let random_str = generate_crude_string(
             &RandomizerOptions { 
                 total_number: 1, 
                 length_of_strings: 10, 
@@ -127,7 +128,7 @@ mod tests {
     
     #[test]
     fn should_generate_random_numeric() {
-        let random_str = generate_string(
+        let random_str = generate_crude_string(
             &RandomizerOptions { 
                 total_number: 1, 
                 length_of_strings: 10, 
@@ -140,7 +141,7 @@ mod tests {
     
     #[test]
     fn should_generate_sized_random_string() {
-        let random_str = generate_string(
+        let random_str = generate_crude_string(
             &RandomizerOptions { 
                 total_number: 1, 
                 length_of_strings: 10, 
