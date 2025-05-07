@@ -8,4 +8,6 @@ fn main() {
     (0..cli_options.total_number).for_each(|_| println!("{}", generate_string(&cli_options)));
     
     // TODO: Add mode where we can use dev/
+    // TODO: Allow for writing output to a file
+    // TODO: Provide better error handling and communication
 }

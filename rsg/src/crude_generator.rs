@@ -1,18 +1,6 @@
-use crate::parser::{CharactersMode, RandomizerOptions};
+use crate::parser::*;
 use rand::Rng;
-
-pub fn generate_mix(chars_mode: &CharactersMode) -> String {
-    let numerals: String = String::from("0123456789");
-    let lowercase: String = String::from("abcdefghijklmnopqrstuvwxyz");
-    let uppercase: String = String::from("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-
-    match chars_mode {
-        CharactersMode::Numeric  => numerals,
-        CharactersMode::Uppercase => uppercase,
-        CharactersMode::Lowercase => lowercase,
-        CharactersMode::Mixed => format!("{}{}{}", numerals, lowercase, uppercase),
-    }
-}
+use crate::utils::generate_mix;
 
 pub fn generate_string(options: &RandomizerOptions) -> String {
     let scope = generate_mix(&options.mode);
@@ -88,6 +76,10 @@ mod tests {
                 }
                 
                 return has_numeric && has_uppercase && has_lowercase
+            }
+            
+            CharactersMode::Noisy => {
+                false
             }
         }
     }
