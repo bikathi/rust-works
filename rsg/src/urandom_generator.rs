@@ -1,4 +1,4 @@
-use crate::utils::{Generator,generate_mix};
+use crate::utils::Generator;
 use std::{fs::File, io::Read};
 use crate::parser::CharactersMode;
 
@@ -7,7 +7,7 @@ pub struct UrandomGenerator;
 impl Generator for UrandomGenerator {
     fn generate(mode: &CharactersMode, length: usize) -> String {
         // generate mix of characters to map the bytes in dev/urandom to
-        let mix: Vec<char> = generate_mix(mode);
+        let mix: Vec<char> = Self::from_mix(mode);
         
         // get the handle to the dev/urandom
         let mut file_handle: File = File::open("/dev/urandom").expect("Failed to access urandom!");

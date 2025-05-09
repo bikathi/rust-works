@@ -1,12 +1,12 @@
 use crate::parser::CharactersMode;
 use rand::Rng;
-use crate::utils::{Generator,generate_mix};
+use crate::utils::Generator;
 
 pub struct CrudeGenerator;
 
 impl Generator for CrudeGenerator {
     fn generate(mode: &CharactersMode, length: usize) -> String {
-        let scope: Vec<char> = generate_mix(mode);
+        let scope: Vec<char> = Self::from_mix(mode);
         let mut result = String::new();
         
         for _ in 0..length {
