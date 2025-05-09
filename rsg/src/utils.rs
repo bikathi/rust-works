@@ -35,3 +35,7 @@ pub fn write_to_file(file: &String, buffer: Vec<String>) {
     // Write contents to the file
     output_file.write(string_to_write.as_bytes()).expect("write to file failed!");
 }
+
+pub trait Generator {
+    fn generate(mode: &CharactersMode, length: usize) -> String;
+}

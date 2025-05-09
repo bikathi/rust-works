@@ -1,19 +1,23 @@
-use crate::parser::*;
+use crate::parser::CharactersMode;
 use rand::Rng;
-use crate::utils::generate_mix;
+use crate::utils::{Generator,generate_mix};
 
-pub fn generate_crude_string(options: &RandomizerOptions) -> String {
-    let scope: Vec<char> = generate_mix(&options.mode);
-    let mut result = String::new();
-    
-    for _ in 0..options.length_of_strings {
-        let secret_number = rand::rng().random_range(0..scope.len());
-        result.push(scope[secret_number]);
+pub struct CrudeGenerator;
+
+impl Generator for CrudeGenerator {
+    fn generate(mode: &CharactersMode, length: usize) -> String {
+        let scope: Vec<char> = generate_mix(mode);
+        let mut result = String::new();
+        
+        for _ in 0..length {
+            let secret_number = rand::rng().random_range(0..scope.len());
+            result.push(scope[secret_number]);
+        }
+        result
     }
-    result
 }
 
-
+/*
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -152,3 +156,4 @@ mod tests {
         assert!(random_str.len() == 10);
     }
 }
+*/
