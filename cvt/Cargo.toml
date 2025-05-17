@@ -1,0 +1,12 @@
+[package]
+name = "cvt"
+version = "0.1.0"
+edition = "2024"
+authors = ["Bikathi Martin", "bikathimartin@outlook.com"]
+description = "A simple CLI-Only, unit converter"
+license = "Apache v2"
+categories = ["command-line-utilities"]
+keywords = ["random", "unit", "converter", "rust"]
+
+[dependencies]
+clap = { version = "4.5.38", features = ["derive"] }
