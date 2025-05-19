@@ -10,10 +10,10 @@ pub struct InputArgs {
     #[arg(short = 'i', long = "input")]
     pub input: usize,
     
-    #[arg(short = 'f', long = "from_unit")]
+    #[arg(short = 'f', long = "from")]
     pub from: String,
     
-    #[arg(short = 't', long = "to_unit")]
+    #[arg(short = 't', long = "to")]
     pub to: String,
 }
 
