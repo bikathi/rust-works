@@ -1,14 +1,20 @@
 use std::{str::FromStr, fmt::Display};
 use clap::Parser;
 
-#[derive(PartialEq, Debug, Parser, Clone, Copy)]
+#[derive(PartialEq, Debug, Parser, Clone)]
 #[command(version, about)]
 pub struct InputArgs {
     #[arg(short = 'u', long = "unit")]
     pub unit: ConversionUnit,
     
     #[arg(short = 'i', long = "input")]
-    pub input: usize
+    pub input: usize,
+    
+    #[arg(short = 'f', long = "from_unit")]
+    pub from: String,
+    
+    #[arg(short = 't', long = "to_unit")]
+    pub to: String,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
