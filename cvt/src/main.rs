@@ -3,7 +3,8 @@ use cvt::{
     parser::{ConversionUnit, InputArgs}, 
     time_converter::TimeUnits, 
     utils::ConversionUtil,  
-    distance_converter::DistanceUnits
+    distance_converter::DistanceUnits,
+    weight_converter::WeightUnits
 };
 
 fn main() {
@@ -17,12 +18,9 @@ fn main() {
     }
     
     match input_options.unit {
-        ConversionUnit::Time => {
-            conversion_dispatcher::<TimeUnits>(input_options);
-        },
-        ConversionUnit::Distance => {
-            conversion_dispatcher::<DistanceUnits>(input_options);
-        },
+        ConversionUnit::Time => conversion_dispatcher::<TimeUnits>(input_options),
+        ConversionUnit::Distance => conversion_dispatcher::<DistanceUnits>(input_options),
+        ConversionUnit::Weight => conversion_dispatcher::<WeightUnits>(input_options),
     }
 }
 

@@ -20,7 +20,8 @@ pub struct InputArgs {
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum ConversionUnit {
     Time,
-    Distance
+    Distance,
+    Weight
 }
 
 impl FromStr for ConversionUnit {
@@ -30,6 +31,7 @@ impl FromStr for ConversionUnit {
         match s.to_lowercase().as_str() {
             "time" => Ok(ConversionUnit::Time),
             "distance" => Ok(ConversionUnit::Distance),
+            "weight" => Ok(ConversionUnit::Weight),
             _ => Err("Invalid input format!"),
         }
     }
@@ -40,6 +42,7 @@ impl Display for ConversionUnit {
         match self {
             ConversionUnit::Time => write!(f, "Time"),
             ConversionUnit::Distance => write!(f, "Distance"),
+            ConversionUnit::Weight => write!(f, "Weight"),
         }
     }
 }
