@@ -4,5 +4,11 @@ use clap::Parser;
 #[command(version, about)]
 pub struct CliInput {
     #[arg(short = 'f', long = "file-name")]
-    pub file_name: String,
+    file_name: String,
+}
+
+impl CliInput {
+    pub fn get_file_name(self: &Self) -> &String {
+        &self.file_name
+    }
 }
