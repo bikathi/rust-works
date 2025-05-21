@@ -1,11 +1,25 @@
 use clap::Parser;
 use cn::{
-    input_handler::CliInput,
-    file_utils::FileUtils,
+    file_utils::FileUtils, 
+    input_handler::{CliInput, ModeCommands}
 };
 
 fn main() {
     let cli_args:CliInput = CliInput::parse();
     
-    FileUtils::rename_file(&cli_args.get_file_name(), &cli_args.get_to_name().as_str());
+    match cli_args.get_mode_commands() {
+        ModeCommands::Single { file_name, new_name } => {
+            FileUtils::rename_file(&file_name, new_name);
+        },
+        ModeCommands::Bulk { directory, pattern, replacement, recursive, rename_folders, rename_files } => {
+            // This block will execute when the 'bulk' subcommand is used.
+            println!("'bulk' subcommand activated:");
+            println!("  Directory: {}", directory.display());
+            println!("  Pattern: '{}'", pattern);
+            println!("  Replacement: '{}'", replacement);
+            println!("  Recursive: {}", recursive);
+            println!("  Rename Folders: {}", rename_folders);
+            println!("  Rename Files: {}", rename_files);
+        }
+    }
 }

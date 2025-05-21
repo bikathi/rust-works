@@ -1,21 +1,50 @@
-use clap::Parser;
+use clap::{Parser,Subcommand};
+use std::path::PathBuf; // a special string used for handling file paths
 
 #[derive(PartialEq, Debug, Parser, Clone)]
-#[command(version, about)]
+#[command(author, version, about, long_about = None)]
 pub struct CliInput {
-    #[arg(short = 'f', long = "file-name")]
-    file_name: String,
-    
-    #[arg(short = 't', long = "to-name")]
-    to_name: String,
+    #[command(subcommand)] // This macro tells clap to look for subcommands
+    command: ModeCommands,
 }
 
 impl CliInput {
-    pub fn get_file_name(self: &Self) -> &String {
-        &self.file_name
+    pub fn get_mode_commands(self: &Self) -> &ModeCommands {
+        &self.command
     }
+}
+
+// the available sub-commands for the renaming tool
+#[derive(Subcommand, Debug, PartialEq, Clone)]
+pub enum ModeCommands {
+    // when doing a simple rename to a single file
+    Single {
+        #[arg(short = 'f', long = "file-name")]
+        file_name: String,
+        
+        #[arg(short = 'n', long = "new-name")]
+        new_name: String,
+    },
     
-    pub fn get_to_name(self: &Self) -> &String {
-        &self.to_name
-    }
+    // Bulk renames files and/or folders in a specified directory based on a regex pattern.
+    Bulk {
+        /// The directory in which to perform the bulk renaming.
+        #[arg(short, long, value_name = "DIRECTORY_PATH")]
+        directory: PathBuf, // Use PathBuf for directory paths
+        /// The regular expression pattern to match against file/folder names.
+        #[arg(short, long, value_name = "REGEX_PATTERN")]
+        pattern: String,
+        /// The replacement string for matched patterns. Capture groups can be used (e.g., '$1').
+        #[arg(short, long, value_name = "REPLACEMENT_STRING")]
+        replacement: String,
+        /// If set, the tool will recursively traverse subdirectories.
+        #[arg(short, long)]
+        recursive: bool,
+        /// If set, folders will also be renamed based on the pattern.
+        #[arg(long)]
+        rename_folders: bool,
+        /// If set, only files will be renamed (default behavior if --rename-folders is not present).
+        #[arg(long, conflicts_with = "rename_folders")]
+        rename_files: bool, // Added for clarity, conflicts with rename_folders
+    },
 }
