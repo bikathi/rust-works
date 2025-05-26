@@ -3,6 +3,7 @@ use cn::{
     file_utils::FileUtils, 
     input_handler::{CliInput, ModeCommands}
 };
+use regex::Regex;
 
 fn main() {
     let cli_args:CliInput = CliInput::parse();
@@ -12,33 +13,22 @@ fn main() {
             FileUtils::rename_file(file_name, new_name);
         },
         ModeCommands::Bulk { directory, pattern, replacement, recursive, rename_folders, rename_files, no_warnings } => {
-            // // This block will execute when the 'bulk' subcommand is used.
-            // println!("'bulk' subcommand activated:");
-            // println!("  Directory: {}", directory.display());
-            // println!("  Pattern: '{}'", pattern);
-            // println!("  Replacement: '{}'", replacement);
-            // println!("  Recursive: {}", recursive);
-            // println!("  Rename Folders: {}", rename_folders);
-            // println!("  Rename Files: {}", rename_files);
-            // println!("  Display Warning: {}", no_warnings);
-            // 
+            let regex = Regex::new(pattern).unwrap_or_else(|_| {panic!("Invalid pattern!")});
             
+            if !directory.exists() {
+                panic!("--directory provided does not exist!");
+            }
             
-            if let true = directory.exists() {
-                if !directory.is_dir() {
-                    eprintln!("'--directory' must be a folder!");
+            if !directory.is_dir() {
+                panic!("'--directory' must be a folder!");
+            }
+            
+            if let Ok(children) = FileUtils::get_base_folder_children(&directory, &regex) {
+                if children.is_empty() {
+                    eprintln!("Cannot work on empty folder!");
                 }
                 
-                if let Ok(children) = FileUtils::get_base_folder_children(&directory) {
-                    if children.is_empty() {
-                        eprintln!("Cannot work on empty folder!");
-                    }
-                    
-                    println!("Folder's children files: {:?}", children);
-                }
-                
-            } else {
-                eprintln!("folder does not exist!");
+                println!("Folder's children files: {:?}", children);
             }
         }
     }
