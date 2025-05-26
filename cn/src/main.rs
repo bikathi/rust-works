@@ -23,7 +23,7 @@ fn main() {
             // println!("  Display Warning: {}", no_warnings);
             // 
             
-            if let true = FileUtils::folder_exists(&directory) {
+            if let true = directory.exists() {
                 println!("folder exists!");
             } else {
                 eprintln!("folder does not exist!");

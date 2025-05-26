@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{PathBuf};
 
 pub struct FileUtils;
 
@@ -8,12 +8,5 @@ impl FileUtils {
             Ok(_) => println!("file renamed"),
             Err(e) => eprintln!("Failed on error {}", e.kind()),
         };
-    } 
-   
-    pub fn folder_exists(folder_path: &PathBuf) -> bool {
-        match std::fs::exists(folder_path) {
-           Ok(_) => true,
-           _ => false
-        }
-    } 
+    }
 }
