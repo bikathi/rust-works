@@ -1,5 +1,5 @@
 use clap::{Parser,Subcommand};
-use std::path::PathBuf; // a special string used for handling file paths
+use std::{path::PathBuf}; // a special string used for handling file paths
 
 #[derive(PartialEq, Debug, Parser, Clone)]
 #[command(author, version, about, long_about = None)]
