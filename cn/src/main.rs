@@ -23,8 +23,20 @@ fn main() {
             // println!("  Display Warning: {}", no_warnings);
             // 
             
+            
             if let true = directory.exists() {
-                println!("folder exists!");
+                if !directory.is_dir() {
+                    eprintln!("'--directory' must be a folder!");
+                }
+                
+                if let Ok(children) = FileUtils::get_base_folder_children(&directory) {
+                    if children.is_empty() {
+                        eprintln!("Cannot work on empty folder!");
+                    }
+                    
+                    println!("Folder's children files: {:?}", children);
+                }
+                
             } else {
                 eprintln!("folder does not exist!");
             }
