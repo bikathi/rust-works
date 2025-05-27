@@ -16,16 +16,16 @@ fn main() {
             let regex = Regex::new(pattern).unwrap_or_else(|_| {panic!("Invalid pattern!")});
             
             if !directory.exists() {
-                panic!("--directory provided does not exist!");
+                panic!("Base directory provided does not exist!");
             }
             
             if !directory.is_dir() {
-                panic!("'--directory' must be a folder!");
+                panic!("Base directory must be a folder!");
             }
             
-            if let Ok(children) = FileUtils::get_base_folder_children(&directory, &regex) {
+            if let Ok(children) = FileUtils::get_base_folder_children(&directory, &regex, *recursive) {
                 if children.is_empty() {
-                    eprintln!("Cannot work on empty folder!");
+                    panic!("Found no files to work on!");
                 }
                 
                 println!("Folder's children files: {:?}", children);
