@@ -46,11 +46,7 @@ pub enum ModeCommands {
         
         /// If set, folders will also be renamed based on the pattern.
         #[arg(long)]
-        rename_folders: bool,
-        
-        /// If set, only files will be renamed (default behavior if --rename-folders is not present).
-        #[arg(long, conflicts_with = "rename_folders")]
-        rename_files: bool, // Added for clarity, conflicts with rename_folders
+        include_folders: bool,
         
         /// If set, will prevent asking user for confirmation before renaming. Use with caution.
         #[arg(long)]
