@@ -1,4 +1,4 @@
-use std::{fs::read_dir, path::{Path, PathBuf}};
+use std::{path::{Path, PathBuf}};
 use regex::Regex;
 
 pub struct FileUtils;
@@ -14,7 +14,8 @@ impl FileUtils {
     pub fn get_base_folder_children(
         folder_path: &Path, 
         pattern: &Regex,
-        recursive: bool
+        recursive: bool,
+        include_folders: bool
     ) -> Result<Vec<PathBuf>, std::io::Error> {
         let mut discovered_entries: Vec<PathBuf> = Vec::new(); 
         
@@ -23,9 +24,15 @@ impl FileUtils {
             let file_type = entry.file_type()?;
             
             if file_type.is_dir() {
-                match FileUtils::get_base_folder_children(&entry.path(), pattern, recursive) {
-                    Ok(children) => discovered_entries.extend_from_slice(&children),
-                    Err(_) => ()
+                if include_folders & pattern.is_match(entry.path().to_str().unwrap()) {
+                    discovered_entries.push(entry.path());
+                }
+                
+                if recursive {
+                    match FileUtils::get_base_folder_children(&entry.path(), pattern, recursive, include_folders) {
+                        Ok(children) => discovered_entries.extend_from_slice(&children),
+                        Err(_) => ()
+                    }
                 }
             }
             
