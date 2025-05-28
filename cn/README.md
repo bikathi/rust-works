@@ -17,7 +17,7 @@ Currently, cn only works on Linux (and possibly all UNIX-like systems), and has 
 ### Compiling on Linux
 1. Install Rust (for Linux) on your computer using [this link](https://rust-book.cs.brown.edu/ch01-01-installation.html)
 2. Clone this repo by running `git clone https://github.com/bikathi/rust-works.git` 
-3. `cd` to the cloned repository folder and run `cargo build --release`. This requires internet access and may take a while to finish.
+3. `cd` to the cloned repository folder then into the `cn` directory and run `cargo build --release`. This requires internet access and may take a while to finish.
 4. After step three `(3)` above has finished, copy the binary in `/target/release/cn` to your `$HOME/.local/bin` usign the command `cp ./target/release/cn ~/.local/bin`. This adds the command cn to your path.
 5. Refresh your path entries above by sourcing your `.bashrc` or `.zshrc` using, for example on `ZSH`, run `source $HOME/.zshrc`
 6. Test installation by running `cn --help` which should respond with a summary of the utility's purpose and list the only two commands the utility provides: `single` and `bulk`.
