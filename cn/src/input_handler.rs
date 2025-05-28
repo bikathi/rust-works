@@ -1,5 +1,5 @@
 use clap::{Parser,Subcommand};
-use std::{io::Write, path::PathBuf};
+use std::{ffi::OsStr, io::Write, path::PathBuf};
 
 const NAME_FOR_FILE: &'static str = "file";
 const NAME_FOR_FOLDER: &'static str = "folder";
@@ -77,8 +77,8 @@ pub fn display_proposed_changes(change_pair: (&PathBuf, &PathBuf)) {
         // the unwrap() calls here is because logic shouldn't fail at this point
         println!(
             "{} [{:?}] [{}] => {new_os_str:?}", 
-            pb.to_str().unwrap(), 
-            pb.file_name().unwrap(), 
+            pb.to_str().unwrap_or_else(|| "?"), 
+            pb.file_name().unwrap_or_else(|| OsStr::new("?")), 
             if pb.is_file() { NAME_FOR_FILE } else { NAME_FOR_FOLDER }
         );
     }
