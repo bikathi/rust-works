@@ -47,12 +47,9 @@ impl FileUtils {
         Ok(discovered_entries)
     }
     
-    pub fn derive_new_names(selector_pattern: &str, old_path: &Vec<PathBuf>, replacement_pattern: &str) -> Vec<(PathBuf, PathBuf)> {
+    pub fn derive_new_names(matching_pattern: Regex, old_path: &Vec<PathBuf>, replacement_pattern: &str) -> Vec<(PathBuf, PathBuf)> {
         // the response Vec
         let mut changes_pair: Vec<(PathBuf, PathBuf)> = Vec::new(); 
-        
-        // create a Regex pattern out of the replacement_pattern. Can be capture groups!
-        let regex = Regex::new(replacement_pattern).unwrap_or_else(|_| {panic!("Invalid pattern!")});
         
         for path in old_path {
             // Attempt to get the original name as a favourable string type
@@ -65,12 +62,11 @@ impl FileUtils {
             };
             
             // Convert original name to Cow<'_, str> and apply the Regex pattern using replace_all to
-            // Get the base for the new name
+            // get the base for the new name
             let original_name: Cow<'_, str> = original_name_os_str.to_string_lossy();
-            let new_name_cow: Cow<'_, str> = Regex::replace_all(&regex, &original_name, replacement_pattern);
+            let new_name_cow: Cow<'_, str> = Regex::replace_all(&matching_pattern, &original_name, replacement_pattern);
             
-            let mut new_name_string: String = new_name_cow.to_string(); // convert name to an owned string
-            println!("selector pattern: {}. orginal name: {}. regex: {} from replacement pattern: {}. new name: {}", selector_pattern, &original_name, regex.as_str(), &replacement_pattern, &new_name_string);
+            let mut new_name_string: String = new_name_cow.to_string();
             
             // Get the parent of the item being renamed and attempt to combine it with the old name
             let parent_dir: &Path = path.parent().unwrap_or_else(|| Path::new(".")); // Assume item is in the CWD
