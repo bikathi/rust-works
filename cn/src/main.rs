@@ -7,6 +7,9 @@ use cn::{
 };
 use regex::Regex;
 
+const NAME_FOR_FILE: &'static str = "file";
+const NAME_FOR_FOLDER: &'static str = "folder";
+
 fn main() {
     let cli_args:CliInput = CliInput::parse();
     
@@ -31,7 +34,7 @@ fn main() {
                 }
                 
                 // get the proposed changes
-                let proposed_changes: Vec<(PathBuf, PathBuf)> = FileUtils::derive_new_names(&pattern, &children, replacement);
+                let proposed_changes: Vec<(PathBuf, PathBuf)> = FileUtils::derive_new_names(regex, &children, replacement);
                 
                 // present this info to the user
                 println!("Discovered {} matching entires", children.len());
@@ -40,7 +43,12 @@ fn main() {
                     .for_each(|(old_path, new_path)| {
                         if let (pb, Some(new_os_str)) = (old_path, new_path.file_name()) {
                             // the unwrap() calls here is because logic shouldn't fail at this point
-                            println!("{} [{:?}] => {new_os_str:?}", pb.to_str().unwrap(), pb.file_name().unwrap());
+                            println!(
+                                "{} [{:?}] [{}] => {new_os_str:?}", 
+                                pb.to_str().unwrap(), 
+                                pb.file_name().unwrap(), 
+                                if pb.is_file() { NAME_FOR_FILE } else { NAME_FOR_FOLDER }
+                            );
                         }
                     });
                 
