@@ -1,5 +1,5 @@
 use clap::{Parser,Subcommand};
-use std::{path::PathBuf}; // a special string used for handling file paths
+use std::{io::Write, path::PathBuf}; // a special string used for handling file paths
 
 #[derive(PartialEq, Debug, Parser, Clone)]
 #[command(author, version, about, long_about = None)]
@@ -36,7 +36,8 @@ pub enum ModeCommands {
         #[arg(short, long, value_name = "REGEX_PATTERN")]
         pattern: String,
         
-        /// The replacement string for matched patterns. Capture groups can be used (e.g., '$1').
+        /// The replacement string for matched patterns. Use capture groups (e.g., '$1')
+        /// to refer to parts of the matched pattern.
         #[arg(long, value_name = "REPLACEMENT_STRING")]
         replacement: String,
         
@@ -50,6 +51,20 @@ pub enum ModeCommands {
         
         /// If set, will prevent asking user for confirmation before renaming. Use with caution.
         #[arg(long)]
-        no_warnings: bool
+        no_warnings: bool,
     },
+}
+
+pub fn get_user_consent() -> Result<bool, &'static str> {
+    print!("Proceed to apply changes? [y/N]: ");
+    std::io::stdout().flush().expect("Failed to flush stdout"); // Ensure the prompt appears before input
+
+    let mut y_on_n = String::new();
+    std::io::stdin().read_line(&mut y_on_n).expect("Failed to read line!");
+
+    match y_on_n.trim().to_lowercase().as_str() { // Trim to remove newline characters
+        "y" => Ok(true),
+        "n" => Ok(false),
+        _ => Err("Invalid input! Will exit"),
+    }
 }
