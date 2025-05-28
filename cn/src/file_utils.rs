@@ -1,5 +1,6 @@
 use std::{borrow::Cow, path::{Path, PathBuf}};
 use regex::Regex;
+use crate::input_handler::display_proposed_changes;
 
 pub struct FileUtils;
 
@@ -47,7 +48,7 @@ impl FileUtils {
         Ok(discovered_entries)
     }
     
-    pub fn derive_new_names(matching_pattern: Regex, old_path: &Vec<PathBuf>, replacement_pattern: &str) -> Vec<(PathBuf, PathBuf)> {
+    pub fn derive_new_names(matching_pattern: Regex, old_path: Vec<PathBuf>, replacement_pattern: &str) -> Vec<(PathBuf, PathBuf)> {
         // the response Vec
         let mut changes_pair: Vec<(PathBuf, PathBuf)> = Vec::new(); 
         
@@ -82,7 +83,6 @@ impl FileUtils {
                     current_new_path.extension().map(|e| e.to_string_lossy())
                 );
                 
-                // Recreate a new name with counter, preserving extension if present
                 new_name_string = format!(
                     "{}_{}{}",
                     stem.unwrap_or_default(),
@@ -93,7 +93,10 @@ impl FileUtils {
                 counter += 1;
             }
             
-            changes_pair.push((path.clone(), current_new_path.clone()));
+            // display proposed changes to the user
+            display_proposed_changes((&path, &current_new_path));
+            
+            changes_pair.push((path.to_owned(), current_new_path));
         }
         
         changes_pair

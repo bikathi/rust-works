@@ -1,5 +1,8 @@
 use clap::{Parser,Subcommand};
-use std::{io::Write, path::PathBuf}; // a special string used for handling file paths
+use std::{io::Write, path::PathBuf};
+
+const NAME_FOR_FILE: &'static str = "file";
+const NAME_FOR_FOLDER: &'static str = "folder";
 
 #[derive(PartialEq, Debug, Parser, Clone)]
 #[command(author, version, about, long_about = None)]
@@ -55,8 +58,8 @@ pub enum ModeCommands {
     },
 }
 
-pub fn get_user_consent() -> Result<bool, &'static str> {
-    print!("Proceed to apply changes? [y/N]: ");
+pub fn get_user_consent(size_of_changes: usize) -> Result<bool, &'static str> {
+    print!("Proceed to apply {} changes? [y/N]: ", size_of_changes);
     std::io::stdout().flush().expect("Failed to flush stdout"); // Ensure the prompt appears before input
 
     let mut y_on_n = String::new();
@@ -66,5 +69,17 @@ pub fn get_user_consent() -> Result<bool, &'static str> {
         "y" => Ok(true),
         "n" => Ok(false),
         _ => Err("Invalid input! Will exit"),
+    }
+}
+
+pub fn display_proposed_changes(change_pair: (&PathBuf, &PathBuf)) {
+    if let (pb, Some(new_os_str)) = (change_pair.0, change_pair.1.file_name()) {
+        // the unwrap() calls here is because logic shouldn't fail at this point
+        println!(
+            "{} [{:?}] [{}] => {new_os_str:?}", 
+            pb.to_str().unwrap(), 
+            pb.file_name().unwrap(), 
+            if pb.is_file() { NAME_FOR_FILE } else { NAME_FOR_FOLDER }
+        );
     }
 }
