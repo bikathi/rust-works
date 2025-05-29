@@ -39,6 +39,7 @@ fn main() {
                 // ask for consent if they didn't disable the warning.
                 // Highly discourage end user from disabling the warnings
                 if *no_warnings {
+                    println!("Consent warning disabled, this is highly discouraged! Proceeding to rename blindly.");
                     FileUtils::execute_rename(proposed_changes);
                 } else {
                     if let Ok(proceeed_to_apply) = get_user_consent(total_discovered) {
