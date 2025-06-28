@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use std::{ffi::OsStr, io::Write, path::PathBuf};
+use std::{ffi::OsStr, fs::File, io::Write, path::PathBuf};
 
 const NAME_FOR_FILE: &'static str = "file";
 const NAME_FOR_FOLDER: &'static str = "folder";
@@ -15,6 +15,11 @@ impl CliInput {
     pub fn get_mode_commands(self: &Self) -> &ModeCommands {
         &self.command
     }
+}
+
+enum DisplayMode {
+    PRINT,
+    FORMAT,
 }
 
 // the available sub-commands for the renaming tool
@@ -58,7 +63,7 @@ pub enum ModeCommands {
 
         /// If set, will publish all changes to the <LOG_FILE_PATH>
         #[arg(long, value_name = "LOG_FILE_PATH")]
-        log_out: PathBuf,
+        log_out: Option<PathBuf>,
     },
 }
 
@@ -93,4 +98,59 @@ pub fn display_proposed_changes(change_pair: (&PathBuf, &PathBuf)) {
             }
         );
     }
+}
+
+pub fn log_executed_changes(change_pair: Vec<(PathBuf, PathBuf)>, file_location: PathBuf) {
+    // this function logs changes to <file_location>
+    let mut output_file: File;
+
+    if let Ok(_) = file_location.try_exists() {
+        // open the file in write mode
+        output_file = File::create(file_location).unwrap();
+    } else {
+        // else create a new file
+        output_file = File::create_new(file_location).unwrap();
+    }
+
+    for pair in change_pair {
+        let mut formatted_string: String =
+            print_or_else((&pair.0, &pair.1), DisplayMode::FORMAT).unwrap();
+        formatted_string.push_str("\n");
+        output_file.write(formatted_string.as_bytes()).unwrap();
+    }
+}
+
+fn print_or_else(change_pair: (&PathBuf, &PathBuf), mode: DisplayMode) -> Option<String> {
+    if let (pb, Some(new_os_str)) = (change_pair.0, change_pair.1.file_name()) {
+        match mode {
+            DisplayMode::PRINT => {
+                println!(
+                    "{} [{:?}] [{}] => {new_os_str:?}",
+                    pb.to_str().unwrap_or_else(|| "?"),
+                    pb.file_name().unwrap_or_else(|| OsStr::new("?")),
+                    if pb.is_file() {
+                        NAME_FOR_FILE
+                    } else {
+                        NAME_FOR_FOLDER
+                    }
+                );
+
+                return None;
+            }
+            DisplayMode::FORMAT => {
+                return Some(format!(
+                    "{} [{:?}] [{}] => {new_os_str:?}",
+                    pb.to_str().unwrap_or_else(|| "?"),
+                    pb.file_name().unwrap_or_else(|| OsStr::new("?")),
+                    if pb.is_file() {
+                        NAME_FOR_FILE
+                    } else {
+                        NAME_FOR_FOLDER
+                    }
+                ));
+            }
+        }
+    }
+
+    return None;
 }

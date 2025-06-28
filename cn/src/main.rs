@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use clap::Parser;
 use cn::{
     file_utils::FileUtils,
-    input_handler::{CliInput, ModeCommands, get_user_consent},
+    input_handler::{CliInput, ModeCommands, get_user_consent, log_executed_changes},
 };
 use regex::Regex;
 
@@ -54,17 +54,23 @@ fn main() {
                     FileUtils::derive_new_names(regex, children, replacement);
 
                 // ask for consent if they didn't disable the warning.
-                // Highly discourage end user from disabling the warnings
+                // Highly discourage the user from disabling the warnings
                 if *no_warnings {
                     println!(
                         "Consent warning disabled, this is highly discouraged! Proceeding to rename blindly."
                     );
                     FileUtils::execute_rename(&proposed_changes);
+
+                    // log out to file if needed
+                    optionally_output_to_logfile(log_out, proposed_changes);
                 } else {
                     if let Ok(proceeed_to_apply) = get_user_consent(total_discovered) {
                         if proceeed_to_apply {
                             FileUtils::execute_rename(&proposed_changes);
                             println!("Done!");
+
+                            // log out to file if needed
+                            optionally_output_to_logfile(log_out, proposed_changes);
                         } else {
                             println!("Exiting without change!");
                         }
@@ -74,5 +80,12 @@ fn main() {
                 }
             }
         }
+    }
+}
+
+fn optionally_output_to_logfile(log_file: &Option<PathBuf>, change_pair: Vec<(PathBuf, PathBuf)>) {
+    if let Some(path_buf) = log_file {
+        log_executed_changes(change_pair, path_buf.clone());
+        println!("Output written to: {:?}", path_buf);
     }
 }
