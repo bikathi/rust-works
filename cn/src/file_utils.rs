@@ -102,7 +102,7 @@ impl FileUtils {
         changes_pair
     }
     
-    pub fn execute_rename(update_pair: Vec<(PathBuf, PathBuf)>) {
+    pub fn execute_rename(update_pair: &Vec<(PathBuf, PathBuf)>) {
         for (old_path, new_path) in update_pair {
             if let Err(e) = std::fs::rename(&old_path, &new_path) {
                 eprintln!("Failed to rename {} to {}! Cause: {}", old_path.display(), new_path.display(), e);
