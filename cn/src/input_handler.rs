@@ -65,17 +65,17 @@ pub enum ModeCommands {
         #[arg(long, value_name = "LOG_FILE_PATH")]
         log_file: Option<PathBuf>,
     },
-    
+
     /// Used to reverse changes performed in bulk mode, based on a log file
     Revert {
         /// The log file that was generated when the bulk rename action was performed
         #[arg(long, value_name = "LOG_FILE_PATH")]
-        log_file: Option<PathBuf>,
-        
+        log_file: PathBuf,
+
         /// If set, will prevent asking user for confirmation before renaming. Use with caution.
         #[arg(long)]
         no_warnings: bool,
-    }
+    },
 }
 
 pub fn get_user_consent(size_of_changes: usize) -> Result<bool, &'static str> {
@@ -116,28 +116,36 @@ pub fn print_or_else(change_pair: (&PathBuf, &PathBuf), mode: DisplayMode) -> Op
         match mode {
             DisplayMode::PRINT => {
                 println!(
-                    "{} [{:?}] [{}] => {new_os_str:?}",
+                    "{} [{}] [{}] => {}",
                     pb.to_str().unwrap_or_else(|| "?"),
-                    pb.file_name().unwrap_or_else(|| OsStr::new("?")),
+                    pb.file_name()
+                        .unwrap_or_else(|| OsStr::new("?"))
+                        .to_str()
+                        .unwrap(),
                     if pb.is_file() {
                         NAME_FOR_FILE
                     } else {
                         NAME_FOR_FOLDER
-                    }
+                    },
+                    new_os_str.to_str().unwrap()
                 );
 
                 return None;
             }
             DisplayMode::FORMAT => {
                 return Some(format!(
-                    "{} [{:?}] [{}] => {new_os_str:?}",
+                    "{} [{}] [{}] => {}",
                     pb.to_str().unwrap_or_else(|| "?"),
-                    pb.file_name().unwrap_or_else(|| OsStr::new("?")),
+                    pb.file_name()
+                        .unwrap_or_else(|| OsStr::new("?"))
+                        .to_str()
+                        .unwrap(),
                     if pb.is_file() {
                         NAME_FOR_FILE
                     } else {
                         NAME_FOR_FOLDER
-                    }
+                    },
+                    new_os_str.to_str().unwrap()
                 ));
             }
         }
@@ -145,3 +153,5 @@ pub fn print_or_else(change_pair: (&PathBuf, &PathBuf), mode: DisplayMode) -> Op
 
     return None;
 }
+
+pub fn parse_changes_from_logs(log_buffer: &str) {}
