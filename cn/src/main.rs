@@ -11,12 +11,15 @@ fn main() {
     let cli_args: CliInput = CliInput::parse();
 
     match cli_args.get_mode_commands() {
+        // for single-file renames
         ModeCommands::Single {
             file_name,
             new_name,
         } => {
             FileUtils::rename_file(file_name, new_name);
         }
+
+        // for multi-file renames
         ModeCommands::Bulk {
             directory,
             pattern,
@@ -24,7 +27,7 @@ fn main() {
             recursive,
             include_folders,
             no_warnings,
-            log_out,
+            log_file,
         } => {
             let regex = Regex::new(pattern).unwrap_or_else(|_| panic!("Invalid pattern!"));
 
@@ -62,7 +65,7 @@ fn main() {
                     FileUtils::execute_rename(&proposed_changes);
 
                     // log out to file if needed
-                    optionally_output_to_logfile(log_out, proposed_changes);
+                    optionally_output_to_logfile(log_file, proposed_changes);
                 } else {
                     if let Ok(proceeed_to_apply) = get_user_consent(total_discovered) {
                         if proceeed_to_apply {
@@ -70,7 +73,7 @@ fn main() {
                             println!("Done!");
 
                             // log out to file if needed
-                            optionally_output_to_logfile(log_out, proposed_changes);
+                            optionally_output_to_logfile(log_file, proposed_changes);
                         } else {
                             println!("Exiting without change!");
                         }
@@ -79,6 +82,15 @@ fn main() {
                     }
                 }
             }
+        }
+
+        // for reverting milti-file (bulk) renames
+        ModeCommands::Revert {
+            log_file,
+            no_warnings,
+        } => {
+            println!("log file: {:?}", log_file);
+            println!("no warnings: {no_warnings}");
         }
     }
 }

@@ -25,7 +25,7 @@ enum DisplayMode {
 // the available sub-commands for the renaming tool
 #[derive(Subcommand, Debug, PartialEq, Clone)]
 pub enum ModeCommands {
-    // when doing a simple rename to a single file
+    /// Use when doing a simple rename to a single file
     Single {
         #[arg(short = 'f', long = "file-name")]
         file_name: PathBuf,
@@ -34,7 +34,7 @@ pub enum ModeCommands {
         new_name: String,
     },
 
-    // Bulk renames files and/or folders in a specified directory based on a regex pattern.
+    /// Use when renaming multiple files and/or folders in a specified directory based on a regex pattern.
     Bulk {
         /// The base directory in which to perform the bulk renaming.
         #[arg(short, long, value_name = "DIRECTORY_PATH")]
@@ -63,8 +63,19 @@ pub enum ModeCommands {
 
         /// If set, will publish all changes to the <LOG_FILE_PATH>
         #[arg(long, value_name = "LOG_FILE_PATH")]
-        log_out: Option<PathBuf>,
+        log_file: Option<PathBuf>,
     },
+    
+    /// Used to reverse changes performed in bulk mode, based on a log file
+    Revert {
+        /// The log file that was generated when the bulk rename action was performed
+        #[arg(long, value_name = "LOG_FILE_PATH")]
+        log_file: Option<PathBuf>,
+        
+        /// If set, will prevent asking user for confirmation before renaming. Use with caution.
+        #[arg(long)]
+        no_warnings: bool,
+    }
 }
 
 pub fn get_user_consent(size_of_changes: usize) -> Result<bool, &'static str> {
