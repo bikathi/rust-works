@@ -2,8 +2,8 @@ use std::path::PathBuf;
 
 use clap::Parser;
 use cn::{
-    file_utils::FileUtils,
-    input_handler::{CliInput, ModeCommands, get_user_consent, log_executed_changes},
+    file_utils::{FileUtils, log_executed_changes},
+    input_handler::{CliInput, ModeCommands, get_user_consent},
 };
 use regex::Regex;
 
@@ -84,7 +84,7 @@ fn main() {
             }
         }
 
-        // for reverting milti-file (bulk) renames
+        // for reverting multi-file (bulk) renames
         ModeCommands::Revert {
             log_file,
             no_warnings,

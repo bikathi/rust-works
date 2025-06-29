@@ -1,6 +1,7 @@
-use std::{borrow::Cow, path::{Path, PathBuf}};
+use std::{borrow::Cow, path::{Path, PathBuf}, io::Write};
 use regex::Regex;
-use crate::input_handler::display_proposed_changes;
+use crate::input_handler::{display_proposed_changes, print_or_else, DisplayMode};
+use std::{fs::File};
 
 pub struct FileUtils;
 
@@ -108,5 +109,25 @@ impl FileUtils {
                 eprintln!("Failed to rename {} to {}! Cause: {}", old_path.display(), new_path.display(), e);
             }
         }
+    }
+}
+
+pub fn log_executed_changes(change_pair: Vec<(PathBuf, PathBuf)>, file_location: PathBuf) {
+    // this function logs changes to <file_location>
+    let mut output_file: File;
+
+    if let Ok(_) = file_location.try_exists() {
+        // open the file in write mode
+        output_file = File::create(file_location).unwrap();
+    } else {
+        // else create a new file
+        output_file = File::create_new(file_location).unwrap();
+    }
+
+    for pair in change_pair {
+        let mut formatted_string: String =
+            print_or_else((&pair.0, &pair.1), DisplayMode::FORMAT).unwrap();
+        formatted_string.push_str("\n");
+        output_file.write(formatted_string.as_bytes()).unwrap();
     }
 }
