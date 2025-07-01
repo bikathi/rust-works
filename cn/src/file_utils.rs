@@ -206,7 +206,13 @@ pub fn extract_artifact_names(logs_buffer: &Vec<String>) -> Vec<FileChanges> {
                 .to_owned();
             let new_given_name_path = dir_section.join(new_given_name);
 
-            FileChanges::new(old_file_path, new_given_name_path.to_str().unwrap())
+            // old is the current version and new is what it will be i.e what it was before the change
+            let changes = FileChanges::new(new_given_name_path.to_str().unwrap(), old_file_path);
+
+            // display proposed changes to the user
+            display_proposed_changes((&changes.old, &changes.new));
+
+            changes
         })
         .collect()
 }

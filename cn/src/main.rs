@@ -62,14 +62,14 @@ fn main() {
                 // Highly discourage the user from disabling the warnings
                 if *no_warnings {
                     println!(
-                        "Consent warning disabled, this is highly discouraged! Proceeding to rename blindly."
+                        "Consent warning disabled, this is highly discouraged! Proceeding to rename blindly!"
                     );
                     FileUtils::execute_rename(&proposed_changes);
 
                     // log out to file if needed
                     optionally_output_to_logfile(log_file, proposed_changes);
                 } else {
-                    if let Ok(proceeed_to_apply) = get_user_consent(total_discovered) {
+                    if let Ok(proceeed_to_apply) = get_user_consent(total_discovered, "apply") {
                         if proceeed_to_apply {
                             FileUtils::execute_rename(&proposed_changes);
                             println!("Done!");
@@ -92,8 +92,27 @@ fn main() {
             no_warnings,
         } => {
             if let Ok(contents) = parse_logs_to_buffer(&log_file) {
-                let changes = extract_artifact_names(&contents);
-                println!("changes = {changes:#?}");
+                let proposed_changes = extract_artifact_names(&contents);
+                // count how many items were discovered
+                let total_discovered: usize = proposed_changes.len();
+
+                if *no_warnings {
+                    println!(
+                        "Consent warning disabled, this is highly discouraged! Reverting blindly!"
+                    );
+                    FileUtils::execute_rename(&proposed_changes);
+                } else {
+                    if let Ok(proceeed_to_apply) = get_user_consent(total_discovered, "revert") {
+                        if proceeed_to_apply {
+                            FileUtils::execute_rename(&proposed_changes);
+                            println!("Done! Mode produces no log file!");
+                        } else {
+                            println!("Exiting without change!");
+                        }
+
+                        return;
+                    }
+                }
             }
         }
     }
