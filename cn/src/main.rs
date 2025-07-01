@@ -2,7 +2,9 @@ use std::path::PathBuf;
 
 use clap::Parser;
 use cn::{
-    file_utils::{FileUtils, log_executed_changes},
+    file_utils::{
+        FileChanges, FileUtils, extract_artifact_names, log_executed_changes, parse_logs_to_buffer,
+    },
     input_handler::{CliInput, ModeCommands, get_user_consent},
 };
 use regex::Regex;
@@ -53,7 +55,7 @@ fn main() {
                 let total_discovered: usize = children.len();
 
                 // get the proposed changes
-                let proposed_changes: Vec<(PathBuf, PathBuf)> =
+                let proposed_changes: Vec<FileChanges> =
                     FileUtils::derive_new_names(regex, children, replacement);
 
                 // ask for consent if they didn't disable the warning.
@@ -89,13 +91,15 @@ fn main() {
             log_file,
             no_warnings,
         } => {
-            println!("log file: {:?}", log_file);
-            println!("no warnings: {no_warnings}");
+            if let Ok(contents) = parse_logs_to_buffer(&log_file) {
+                let changes = extract_artifact_names(&contents);
+                println!("changes = {changes:#?}");
+            }
         }
     }
 }
 
-fn optionally_output_to_logfile(log_file: &Option<PathBuf>, change_pair: Vec<(PathBuf, PathBuf)>) {
+fn optionally_output_to_logfile(log_file: &Option<PathBuf>, change_pair: Vec<FileChanges>) {
     if let Some(path_buf) = log_file {
         log_executed_changes(change_pair, path_buf.clone());
         println!("Output written to: {:?}", path_buf);

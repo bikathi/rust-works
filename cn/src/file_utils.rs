@@ -22,6 +22,10 @@ impl FileChanges {
             new: PathBuf::from_str(new).unwrap(),
         }
     }
+
+    fn new_from_type(old: PathBuf, new: PathBuf) -> Self {
+        Self { old, new }
+    }
 }
 
 pub struct FileUtils;
@@ -79,9 +83,9 @@ impl FileUtils {
         matching_pattern: Regex,
         old_path: Vec<PathBuf>,
         replacement_pattern: &str,
-    ) -> Vec<(PathBuf, PathBuf)> {
+    ) -> Vec<FileChanges> {
         // the response Vec
-        let mut changes_pair: Vec<(PathBuf, PathBuf)> = Vec::new();
+        let mut changes_pair: Vec<FileChanges> = Vec::new();
 
         for path in old_path {
             // Attempt to get the original name as a favourable string type
@@ -131,19 +135,22 @@ impl FileUtils {
             // display proposed changes to the user
             display_proposed_changes((&path, &current_new_path));
 
-            changes_pair.push((path.to_owned(), current_new_path));
+            changes_pair.push(FileChanges::new_from_type(
+                path.to_owned(),
+                current_new_path,
+            ));
         }
 
         changes_pair
     }
 
-    pub fn execute_rename(update_pair: &Vec<(PathBuf, PathBuf)>) {
-        for (old_path, new_path) in update_pair {
-            if let Err(e) = std::fs::rename(&old_path, &new_path) {
+    pub fn execute_rename(file_changes: &Vec<FileChanges>) {
+        for change in file_changes {
+            if let Err(e) = std::fs::rename(&change.old, &change.new) {
                 eprintln!(
                     "Failed to rename {} to {}! Cause: {}",
-                    old_path.display(),
-                    new_path.display(),
+                    change.old.display(),
+                    change.new.display(),
                     e
                 );
             }
@@ -151,7 +158,7 @@ impl FileUtils {
     }
 }
 
-pub fn log_executed_changes(change_pair: Vec<(PathBuf, PathBuf)>, file_location: PathBuf) {
+pub fn log_executed_changes(change_pair: Vec<FileChanges>, file_location: PathBuf) {
     // this function logs changes to <file_location>
     let mut output_file: File;
 
@@ -165,7 +172,7 @@ pub fn log_executed_changes(change_pair: Vec<(PathBuf, PathBuf)>, file_location:
 
     for pair in change_pair {
         let mut formatted_string: String =
-            print_or_else((&pair.0, &pair.1), DisplayMode::FORMAT).unwrap();
+            print_or_else((&pair.old, &pair.new), DisplayMode::FORMAT).unwrap();
         formatted_string.push_str("\n");
         output_file.write(formatted_string.as_bytes()).unwrap();
     }
