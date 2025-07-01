@@ -78,8 +78,11 @@ pub enum ModeCommands {
     },
 }
 
-pub fn get_user_consent(size_of_changes: usize) -> Result<bool, &'static str> {
-    print!("Proceed to apply {} changes? [y/N]: ", size_of_changes);
+pub fn get_user_consent(size_of_changes: usize, to_perform: &str) -> Result<bool, &'static str> {
+    print!(
+        "Proceed to {to_perform} {} changes? [y/N]: ",
+        size_of_changes
+    );
     std::io::stdout().flush().expect("Failed to flush stdout"); // Ensure the prompt appears before input
 
     let mut y_on_n = String::new();
@@ -153,5 +156,3 @@ pub fn print_or_else(change_pair: (&PathBuf, &PathBuf), mode: DisplayMode) -> Op
 
     return None;
 }
-
-pub fn parse_changes_from_logs(log_buffer: &str) {}
