@@ -28,7 +28,7 @@ Currently, cn only works on Linux (and possibly all UNIX-like systems), and has 
 
 ## Subcommands
 
-cn provides only two subcommands (which are ways to invoke it)
+cn provides three subcommands (which are ways to invoke it)
 
 ### 1. `single` mode
 
@@ -93,7 +93,7 @@ cn provides only two subcommands (which are ways to invoke it)
 - **Type**: Boolean flag
 - **Description**: An optional flag which if present, the utility will suppress the y/N consent check asked before applying irreversible rename changes. **Use with caution, as this removes a vital safety check**.
 
-`--log-out`
+`--log-file`
 
 - **Type**: String flag
 - **Description**: An optional flag which if present, will have `cn` write the change logs to a file of your choosing. 
@@ -190,6 +190,26 @@ my_files/
 
    - **Command**: `cn bulk -d my_files -p '(.*)project(.*)' --replacement '$1final$2' --recursive --include-folders --log-out  "log.txt"`
    - **Action**: Renames `project_docs/` to `final_docs/`, and if any files or folders inside `project_docs/` matched 'project', they would also be renamed, alongside their subfolders, if a folder, and writes all changes to `log.txt`.
+   
+### 3. `revert` mode
+
+- Invoked via `cn revert <ARGUMENTS>`
+- Allows you to revert changes made to files that were renamed in bulk mode if the `--log-file` was provided.
+**NB**: This mode requires you to have a log file generated alongside changes you authorized in `bulk` mode, which means you need to have run `bulk` mode with the
+`--log-file` flag passed, or you will have to write one yourself.
+
+---
+
+### Arguments
+
+`--log-file <FILE_PATH>`
+
+- **Type**: String
+- **Description**: The full path to the file containing logs for changes made in a bulk
+
+### Usage Examples
+
+1. To revert changes made previously in bulk, which logged to a file named `log.txt`, run `cn revert --log-file log-txt`.
 
 ## Error Handling & Warnings
 
@@ -202,7 +222,6 @@ my_files/
 ## Contributing & Future Enhancements
 
 cn is designed to be extensible. Potential future enhancements could include:
-- **Undo Functionality**: A mechanism to revert the last bulk rename operation.
 - **More Advanced Renaming Options**:
   - Case conversion (e.g., convert all names to snake_case, camelCase).
   - Number padding (e.g., file1.txt -> file001.txt).
