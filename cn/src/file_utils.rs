@@ -1,12 +1,28 @@
 use crate::input_handler::{DisplayMode, display_proposed_changes, print_or_else};
+use rayon::prelude::*;
 use regex::Regex;
 use std::fs::File;
-use std::io::Read;
+use std::str::FromStr;
 use std::{
     borrow::Cow,
     io::Write,
     path::{Path, PathBuf},
 };
+
+#[derive(Debug)]
+pub struct FileChanges {
+    old: PathBuf,
+    new: PathBuf,
+}
+
+impl FileChanges {
+    fn new(old: &str, new: &str) -> Self {
+        Self {
+            old: PathBuf::from_str(old).unwrap(),
+            new: PathBuf::from_str(new).unwrap(),
+        }
+    }
+}
 
 pub struct FileUtils;
 
@@ -163,4 +179,27 @@ pub fn parse_logs_to_buffer(log_file: &PathBuf) -> Result<Vec<String>, std::io::
         }
         Err(e) => Err(e),
     }
+}
+
+pub fn extract_artifact_names(logs_buffer: &Vec<String>) -> Vec<FileChanges> {
+    logs_buffer
+        .par_iter()
+        .map(|lb| {
+            // lb syntax: ./random_files_folder/ADMINASSETCOMPONENT_683.html [ADMINASSETCOMPONENT_683.html] [folder] => FINAL_ADMINASSETCOMPONENT_683.html
+            let sections: Vec<&str> = lb.split("=>").collect();
+
+            let old_file_path = sections[0].split(" ").collect::<Vec<&str>>()[0]; // for example ./random_files_folder/ADMINASSETCOMPONENT_683.html
+            let new_given_name = sections[sections.len() - 1].trim(); // for example FINAL_ADMINASSETCOMPONENT_683.html
+
+            // concatenate the dir to new_given_name
+            let old_file_as_prop_path = Path::new(&old_file_path);
+            let dir_section = old_file_as_prop_path
+                .parent()
+                .unwrap_or(Path::new(""))
+                .to_owned();
+            let new_given_name_path = dir_section.join(new_given_name);
+
+            FileChanges::new(old_file_path, new_given_name_path.to_str().unwrap())
+        })
+        .collect()
 }
