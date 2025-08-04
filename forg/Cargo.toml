@@ -1,0 +1,19 @@
+[package]
+name = "forg"
+version = "0.1.0"
+edition = "2024"
+authors = ["Bikathi Martin", "bikathimartin@outlook.com"]
+description = "A simple CLI-Only, file organization tool"
+license = "Apache V2"
+categories = ["command-line-utilities"]
+keywords = ["files", "file", "organization"]
+
+[dependencies]
+clap = { version = "4.5.38", features = ["derive"] }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
+panic = 'abort'

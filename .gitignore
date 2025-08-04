@@ -3,3 +3,5 @@
 /cn/target
 /cn/**/*.txt
 cn/random_files_folder/
+forg/target
+forg/random_files_folder
