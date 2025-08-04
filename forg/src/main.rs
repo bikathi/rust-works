@@ -1,3 +1,10 @@
+use clap::Parser;
+
+use crate::input::CliInput;
+
+mod input;
+
 fn main() {
-    println!("Hello, world!");
+    let cli_args = CliInput::parse();
+    println!("provided args: {cli_args:?}");
 }
